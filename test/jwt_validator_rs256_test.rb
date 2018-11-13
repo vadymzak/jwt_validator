@@ -4,13 +4,15 @@ require_relative '../lib/jwt_validator'
 
 class JwtValidatiorTest < Minitest::Test
   def setup
-    @hmac_secret = 'hmac_secret'.freeze
-    @hmac_alghorythm = 'HS256'.freeze
+    #@hmac_secret = 'hmac_secret'.freeze
+    @rsa_private = 'rsa_private'.freeze
+    @rsa_public = 'rsa_private'.freeze
+    @hmac_alghorythm = 'RS256'.freeze
     @valid_payload = {
       'user_id' => 1,
       'exp' => Time.now.to_i + 4 * 3600
     }.freeze
-    @valid_token = JWT.encode(@valid_payload, @hmac_secret, @hmac_alghorythm)
+    @valid_token = JWT.encode(@valid_payload, @rsa_private, @hmac_alghorythm)
   end
 
   def test_raises_exception_with_ivalid_algorithm
@@ -21,8 +23,8 @@ class JwtValidatiorTest < Minitest::Test
 
   def test_valid_token_with_hmac_raise_no_error
     result = JwtValidatior::Validator.call(@valid_token,
-                                           algorithm: :hmac,
-                                           algorithm_params: { secret: @hmac_secret, alg: @hmac_alghorythm })
+                                           algorithm: :rs256,
+                                           algorithm_params: { secret: @rsa_public, alg: @hmac_alghorythm })
     assert_equal @valid_payload, result
   end
 
@@ -56,7 +58,7 @@ class JwtValidatiorTest < Minitest::Test
   end
 
   def test_missing_alg_key_raises_exception
-    assert_raises JwtValidatior::Algorithms::Hmac::Exceptions::MissingRequiredKey do
+    assert_raises JwtValidatior::Hmac::Exceptions::MissingRequiredKey do
       JwtValidatior::Validator.call(@valid_token,
                                     algorithm: :hmac,
                                     algorithm_params: { secret: @hmac_secret })
@@ -64,7 +66,7 @@ class JwtValidatiorTest < Minitest::Test
   end
 
   def test_invalid_alg_key_raises_exception
-    assert_raises JwtValidatior::Algorithms::Hmac::Exceptions::InvalidHmacAlgorithm do
+    assert_raises JwtValidatior::Hmac::Exceptions::InvalidHmacAlgorithm do
       JwtValidatior::Validator.call(@valid_token,
                                     algorithm: :hmac,
                                     algorithm_params: { secret: @hmac_secret, alg: :invalid })

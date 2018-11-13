@@ -15,7 +15,7 @@ module JwtValidatior
     private
 
     def algorithm_class
-      Object.const_get("JwtValidatior::#{@algorithm.capitalize}")
+      Object.const_get("JwtValidatior::Algorithms::#{@algorithm.capitalize}")
     rescue NameError
       raise JwtValidatior::Exceptions::InvalidAlgorithm, "invalid algorithm #{@algorithm.capitalize}"
     end

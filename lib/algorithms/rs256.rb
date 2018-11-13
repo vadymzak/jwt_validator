@@ -3,14 +3,14 @@ require_relative '../base_service'
 
 module JwtValidatior
   module Algorithms
-  class Hmac < BaseService
+  class Rs256 < BaseService
     class Exceptions
       class BaseHmacException < JwtValidatior::Exceptions::BaseException; end
       class InvalidHmacAlgorithm < BaseHmacException; end
       class MissingRequiredKey < BaseHmacException; end
     end
 
-    VALID_ALGORITHMS = %w[HS256].freeze
+    VALID_ALGORITHMS = %w[RS256].freeze
     VALID_KEYS = %i[secret alg].freeze
 
     def initialize(payload, params)
