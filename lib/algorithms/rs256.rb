@@ -5,9 +5,9 @@ module JwtValidatior
   module Algorithms
   class Rs256 < BaseService
     class Exceptions
-      class BaseHmacException < JwtValidatior::Exceptions::BaseException; end
-      class InvalidHmacAlgorithm < BaseHmacException; end
-      class MissingRequiredKey < BaseHmacException; end
+      class BaseRs256Exception < JwtValidatior::Exceptions::BaseException; end
+      class InvalidRs256Algorithm < BaseRs256Exception; end
+      class MissingRequiredKey < BaseRs256Exception; end
     end
 
     VALID_ALGORITHMS = %w[RS256].freeze
@@ -20,7 +20,7 @@ module JwtValidatior
 
     def call
       raise Exceptions::MissingRequiredKey, "missing keys: #{@params.keys}" unless required_keys_present?
-      raise Exceptions::InvalidHmacAlgorithm, "invalid alg: #{@params[:alg]}" unless valid_algorithm?
+      raise Exceptions::InvalidRs256Algorithm, "invalid alg: #{@params[:alg]}" unless valid_algorithm?
       decode
     end
 
@@ -35,7 +35,7 @@ module JwtValidatior
     end
 
     def decode
-      JWT.decode(@payload, @params[:secret], true, algorythm: @params[:alg]).first
+      JWT.decode(@payload,  @params[:secret], true, { algorithm: @params[:alg] }).first
     rescue JWT::ExpiredSignature => e
       raise JwtValidatior::Exceptions::ExpiredToken, e
     rescue JWT::DecodeError => e
